@@ -1,10 +1,9 @@
-// controllers/profileController.ts
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-
+// SAVE PROFILE
 export const saveProfile = async (req: Request, res: Response) => {
   try {
     const {
@@ -18,11 +17,13 @@ export const saveProfile = async (req: Request, res: Response) => {
       gender,
       spayed,
       weight,
-      photo,
       color,
       favFood,
       favActivity,
     } = req.body;
+
+    // ✅ file comes from multer
+    const photo = req.file ? req.file.filename : null;
 
     const user = await prisma.user.findUnique({ where: { id: Number(userId) } });
     if (!user) return res.status(404).json({ error: "User not found" });
@@ -34,27 +35,36 @@ export const saveProfile = async (req: Request, res: Response) => {
       create: { userId: user.id, fullName, phone, address },
     });
 
-    // create pet (or update if petId is passed)
-    let pet = await prisma.pet.create({
+    // create pet
+    const pet = await prisma.pet.create({
       data: {
         userId: user.id,
         name: petName,
         breed,
         birthday: birthday ? new Date(birthday) : null,
         gender,
-        spayed,
-        weight,
-        photo,
+       spayed: spayed ? String(spayed) : null,
+weight: weight ? String(weight) : null,
+        photo, // ✅ now stored correctly
         color,
         favFood,
         favActivity,
       },
     });
 
-    res.json({
-      message: "Profile saved successfully",
-      user: { ...user, profile, pets: [pet] },
-    });
+   res.json({
+  message: "Profile saved successfully",
+  user: {
+    ...user,
+    profile,
+    pets: [
+      {
+        ...pet,
+        photo: pet.photo,
+      },
+    ],
+  },
+});
   } catch (error: any) {
     console.error("saveProfile error:", error);
     res.status(500).json({ error: error.message });
@@ -84,7 +94,10 @@ export const updateProfileSection = async (req: Request, res: Response) => {
       });
 
       if (newEmail && newEmail !== user.email) {
-        await prisma.user.update({ where: { id: user.id }, data: { email: newEmail } });
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { email: newEmail },
+        });
       }
     } else if (section === "pet") {
       if (!petId) return res.status(400).json({ error: "petId is required" });

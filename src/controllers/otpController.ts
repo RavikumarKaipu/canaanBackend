@@ -1,5 +1,7 @@
 import { Request,Response } from "express"
 import { PrismaClient } from "@prisma/client";
+import dotenv from 'dotenv';
+dotenv.config();
 
 
 const prisma = new PrismaClient();
@@ -27,7 +29,6 @@ export const verifyEmail=async (req:Request,res:Response)=>{
 export const sendOtp=async (req:Request,res:Response)=>{
     const {email}=req.body;
     if(!email) return res.status(400).json({error:'Email required'});
-
     const otp=Math.floor(100000+Math.random()*900000);
     const timestamp=Date.now();
     try{
