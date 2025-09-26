@@ -19,7 +19,7 @@ model User {
   username   String   @unique
   email      String   @unique
   password   String
-  role       Role     @default(USER)  // 👈 works now
+  role       Role     @default(USER)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
