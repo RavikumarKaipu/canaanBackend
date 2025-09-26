@@ -5,6 +5,7 @@
   import otpRoutes from "./routes/otpRoutes.js";
   import profileRoutes from "./routes/profileRoutes.js";
   import userRoutes from "./routes/userRoutes.js"
+  import adminRoutes from "./routes/adminRoutes.js";
 
   dotenv.config();
 
@@ -20,6 +21,7 @@
   app.use("/api/otp", otpRoutes);
   app.use("/api", profileRoutes);
   app.use("/api/users",userRoutes)
+  app.use("/api/admin", adminRoutes);
 
   // Root endpoint
   app.get("/", (req, res) => {

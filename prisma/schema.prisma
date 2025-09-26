@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-
 }
 
 datasource db {
@@ -8,44 +7,49 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Define enums first
+enum Role {
+  USER
+  ADMIN
+  STAFF
+}
+
 model User {
   id         Int      @id @default(autoincrement())
   username   String   @unique
   email      String   @unique
   password   String
+  role       Role     @default(USER)  // 👈 works now
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  // optional auth/profile fields
-  profile    Profile? // one-to-one
-  pets       Pet[]    // one-to-many, usually single pet but flexible
-
-  // add indexes if you need them
+  profile    Profile?
+  pets       Pet[]
 }
 
 model Profile {
-  id        Int     @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   fullName  String
   phone     String?
   address   String?
-  userId    Int     @unique
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Pet {
-  id         Int      @id @default(autoincrement())
-  name       String
-  breed      String?
-  birthday   DateTime?
-  gender     String?
-  spayed     String?
-  weight     String?
-  photo      String?   // filename or URL
-  color      String?
-  favFood    String?
+  id          Int      @id @default(autoincrement())
+  name        String
+  breed       String?
+  birthday    DateTime?
+  gender      String?
+  spayed      String?
+  weight      String?
+  photo       String?
+  color       String?
+  favFood     String?
   favActivity String?
-  userId     Int
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
